@@ -1,12 +1,45 @@
-# React + Vite
+# Eljon Pharmacy
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+React/Vite pharmacy storefront with a serverless Supabase backend for sales recording and reporting.
 
-Currently, two official plugins are available:
+## Local Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+```powershell
+npm install
+Copy-Item .env.example .env.local
+npm run dev
+```
 
-## Expanding the ESLint configuration
+Fill `.env.local` with your Supabase project values:
 
-If you are developing a production application, we recommend using TypeScript and enable type-aware lint rules. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+```env
+VITE_SUPABASE_URL=https://your-project-ref.supabase.co
+VITE_SUPABASE_ANON_KEY=your-supabase-anon-key
+VITE_ADMIN_EMAILS=owner@example.com,staff@example.com
+```
+
+## Supabase Setup
+
+1. Create a free Supabase project.
+2. Open the SQL editor.
+3. Run [supabase/schema.sql](./supabase/schema.sql).
+4. Create an Auth user for the admin account.
+5. Add that admin email to `VITE_ADMIN_EMAILS`.
+
+## Pages
+
+- `/shop` - customer shopping page
+- `/cart` - checkout writes a sale to Supabase
+- `/admin` - admin sign-in, manual sale recording, and reports
+- `/reports` - report view for signed-in Supabase users
+
+## Deploy To Vercel
+
+Use Vercel with these settings:
+
+- Framework: Vite
+- Build command: `npm run build`
+- Output directory: `dist`
+- Environment variables: same values from `.env.local`
+
+This repo includes `vercel.json` so browser routes like `/admin` work after deployment.

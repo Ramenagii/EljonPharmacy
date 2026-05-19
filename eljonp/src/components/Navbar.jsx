@@ -50,25 +50,17 @@ const itemVariants = {
 const Navbar = ({ cartItems = [] }) => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
-  // Check for mobile viewport and handle scroll events
+  // Handle scroll events
   useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
     const handleScroll = () => {
       const offset = window.scrollY;
       setScrolled(offset > 10);
     };
 
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
     window.addEventListener("scroll", handleScroll);
 
     return () => {
-      window.removeEventListener("resize", checkMobile);
       window.removeEventListener("scroll", handleScroll);
     };
   }, []);
@@ -101,7 +93,7 @@ const Navbar = ({ cartItems = [] }) => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          {["Home", "Shop", "About", "Contact"].map((item, index) => (
+          {["Home", "Shop", "Admin", "Reports", "About", "Contact"].map((item, index) => (
             <motion.div
               key={item}
               initial={{ opacity: 0, y: -20 }}
@@ -214,7 +206,7 @@ const Navbar = ({ cartItems = [] }) => {
             exit="closed"
           >
             <div className="py-2">
-              {["Home", "Shop", "About", "Contact"].map((item, index) => (
+              {["Home", "Shop", "Admin", "Reports", "About", "Contact"].map((item, index) => (
                 <motion.div
                   key={item}
                   variants={itemVariants}

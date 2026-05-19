@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import HomePage from "./pages/HomePage";
 import ShopPage from "./pages/ShopPage";
@@ -7,40 +7,27 @@ import ContactPage from "./pages/ContactPage";
 import SignInPage from "./pages/SignInPage";
 import RegisterPage from "./pages/RegisterPage";
 import CartPage from "./pages/CartPage";
+import ReportsPage from "./pages/ReportsPage";
+import AdminPage from "./pages/AdminPage";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import ScrollToTop from "./components/ScrollToTop";
 
 function App() {
   const [cartItems, setCartItems] = useState([]);
-  const [navHeight, setNavHeight] = useState(70); // Default height
-
-  // Measure navbar height for responsive spacing
-  useEffect(() => {
-    const updateNavHeight = () => {
-      const navElement = document.querySelector("header");
-      if (navElement) {
-        setNavHeight(navElement.offsetHeight);
-      }
-    };
-
-    // Run on mount and window resize
-    updateNavHeight();
-    window.addEventListener("resize", updateNavHeight);
-
-    return () => {
-      window.removeEventListener("resize", updateNavHeight);
-    };
-  }, []);
 
   const addToCart = (product) => {
     setCartItems((prevItems) => [...prevItems, product]);
   };
 
-  const removeFromCart = (productName) => {
+  const removeFromCart = (itemIndex) => {
     setCartItems((prevItems) =>
-      prevItems.filter((item) => item.name !== productName)
+      prevItems.filter((_, index) => index !== itemIndex)
     );
+  };
+
+  const clearCart = () => {
+    setCartItems([]);
   };
 
   return (
@@ -57,12 +44,15 @@ function App() {
             <Route path="/contact" element={<ContactPage />} />
             <Route path="/signin" element={<SignInPage />} />
             <Route path="/register" element={<RegisterPage />} />
+            <Route path="/reports" element={<ReportsPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route
               path="/cart"
               element={
                 <CartPage
                   cartItems={cartItems}
                   removeFromCart={removeFromCart}
+                  clearCart={clearCart}
                 />
               }
             />
