@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { createSale, parsePrice } from '../services/salesApi';
+import { IconCheck, IconShoppingBag, IconTrash } from '@tabler/icons-react';
+import { createSale, money, parsePrice } from '../services/salesApi';
 
 const CartPage = ({ cartItems, removeFromCart, clearCart }) => {
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -12,10 +13,6 @@ const CartPage = ({ cartItems, removeFromCart, clearCart }) => {
   const totalPrice = cartItems.reduce((total, item) => {
     return total + parsePrice(item.price);
   }, 0);
-
-  const handleCheckout = () => {
-    setShowConfirmation(true);
-  };
 
   const handleConfirmPurchase = async () => {
     setIsSubmitting(true);
@@ -47,71 +44,86 @@ const CartPage = ({ cartItems, removeFromCart, clearCart }) => {
   };
 
   return (
-    <div className="relative p-6 max-w-7xl mx-auto">
-      <h1 className="text-2xl font-bold mb-6">Your Cart</h1>
-
-      {/* Cart Items */}
-      <div className="space-y-4">
-        {cartItems.length === 0 ? (
-          <p>Your cart is empty. <Link to="/shop" className="text-teal-500 underline">Go shopping</Link></p>
-        ) : (
-          cartItems.map((item, index) => (
-            <div key={`${item.name}-${index}`} className="flex justify-between items-center border-b pb-4">
-              <div>
-                <p className="font-semibold">{item.name}</p>
-                <p className="text-sm text-gray-500">Price: ${item.price}</p>
-              </div>
-              <div>
-                <button
-                  onClick={() => removeFromCart(index)}
-                  className="text-red-500 hover:text-red-700"
-                >
-                  Remove
-                </button>
-              </div>
-            </div>
-          ))
-        )}
+    <div className="relative mx-auto max-w-7xl px-4 py-10">
+      <div className="mb-8">
+        <h1 className="text-4xl font-bold text-slate-900">Your Cart</h1>
+        <p className="mt-2 text-slate-600">Review items before recording the sale.</p>
       </div>
 
-      {/* Total & Checkout */}
-      {cartItems.length > 0 && (
-        <>
-          <div className="mt-6 flex justify-between items-center font-semibold">
-            <p>Total Price:</p>
-            <p className="text-teal-500">
-              ${isNaN(totalPrice) ? '0.00' : totalPrice.toFixed(2)}
-            </p>
-          </div>
+      {cartItems.length === 0 ? (
+        <div className="rounded-xl border border-dashed border-slate-300 bg-white p-10 text-center">
+          <IconShoppingBag className="mx-auto mb-4 h-10 w-10 text-slate-400" />
+          <p className="text-lg font-semibold text-slate-800">Your cart is empty.</p>
+          <Link to="/shop" className="mt-4 inline-flex rounded-lg bg-teal-600 px-5 py-3 font-semibold text-white hover:bg-teal-700">
+            Go shopping
+          </Link>
+        </div>
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
+          <section className="rounded-xl border bg-white p-5 shadow-sm">
+            <div className="space-y-3">
+              {cartItems.map((item, index) => (
+                <div key={`${item.name}-${index}`} className="flex items-center justify-between gap-4 rounded-lg border border-slate-100 bg-slate-50 p-4">
+                  <div>
+                    <p className="font-semibold uppercase text-slate-900">{item.name}</p>
+                    <p className="text-sm text-slate-500">Qty 1 · {money.format(parsePrice(item.price))}</p>
+                  </div>
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    className="inline-flex items-center rounded-lg border border-red-100 bg-white px-3 py-2 text-sm font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    <IconTrash className="mr-1 h-4 w-4" />
+                    Remove
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
 
-          <div className="mt-6 flex justify-end">
+          <aside className="h-fit rounded-xl border bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-slate-900">Order Summary</h2>
+            <div className="mt-5 space-y-3 border-b border-slate-200 pb-5 text-sm">
+              <div className="flex justify-between text-slate-600">
+                <span>Items</span>
+                <span>{cartItems.length}</span>
+              </div>
+              <div className="flex justify-between text-slate-600">
+                <span>Payment</span>
+                <span>Cash</span>
+              </div>
+            </div>
+            <div className="mt-5 flex items-center justify-between">
+              <span className="font-semibold text-slate-800">Total</span>
+              <span className="text-2xl font-bold text-teal-700">
+                {money.format(Number.isNaN(totalPrice) ? 0 : totalPrice)}
+              </span>
+            </div>
             <button
-              onClick={handleCheckout}
-              className="bg-teal-500 text-white px-6 py-3 rounded-lg hover:bg-teal-600 transition-colors"
+              onClick={() => setShowConfirmation(true)}
+              className="mt-6 w-full rounded-lg bg-teal-600 px-6 py-3 font-semibold text-white hover:bg-teal-700"
             >
               Proceed to Checkout
             </button>
-          </div>
-        </>
+          </aside>
+        </div>
       )}
 
-      {/* Confirmation Summary */}
       {showConfirmation && (
-        <div className="mt-10 border border-gray-300 p-6 rounded-lg bg-gray-50 shadow">
-          <h2 className="text-xl font-bold mb-4">Confirm Your Purchase</h2>
+        <div className="mt-10 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+          <h2 className="mb-4 text-xl font-bold text-slate-900">Confirm Sale</h2>
 
           <ul className="mb-4 space-y-2">
             {cartItems.map((item, index) => (
-              <li key={`${item.name}-${index}`} className="flex justify-between">
+              <li key={`${item.name}-${index}`} className="flex justify-between text-slate-700">
                 <span>{item.name}</span>
-                <span>${item.price}</span>
+                <span>{money.format(parsePrice(item.price))}</span>
               </li>
             ))}
           </ul>
 
-          <div className="flex justify-between font-semibold mb-6">
+          <div className="mb-6 flex justify-between border-t pt-4 font-semibold">
             <p>Total:</p>
-            <p>${totalPrice.toFixed(2)}</p>
+            <p>{money.format(totalPrice)}</p>
           </div>
 
           {checkoutError && (
@@ -123,14 +135,14 @@ const CartPage = ({ cartItems, removeFromCart, clearCart }) => {
           <div className="flex justify-end space-x-4">
             <button
               onClick={() => setShowConfirmation(false)}
-              className="px-4 py-2 border rounded hover:bg-gray-100"
+              className="rounded-lg border px-4 py-2 font-semibold hover:bg-slate-50"
               disabled={isSubmitting}
             >
               Cancel
             </button>
             <button
               onClick={handleConfirmPurchase}
-              className="px-6 py-2 bg-green-600 text-white rounded hover:bg-green-700 transition-colors"
+              className="rounded-lg bg-teal-600 px-6 py-2 font-semibold text-white transition-colors hover:bg-teal-700"
               disabled={isSubmitting}
             >
               {isSubmitting ? 'Saving Sale...' : 'Confirm Purchase'}
@@ -139,25 +151,24 @@ const CartPage = ({ cartItems, removeFromCart, clearCart }) => {
         </div>
       )}
 
-      {/* ✅ Glassmorphism Confirmation Overlay */}
       <AnimatePresence>
         {showSuccessOverlay && (
           <motion.div
-            className="fixed inset-0 bg-black bg-opacity-40 flex items-center justify-center z-50"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/40"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
           >
             <motion.div
-              className="backdrop-blur-xl bg-white/10 border border-white/20 p-8 rounded-2xl text-center shadow-lg text-white max-w-sm w-full"
+              className="w-full max-w-sm rounded-2xl border border-white/20 bg-slate-950/90 p-8 text-center text-white shadow-lg backdrop-blur-xl"
               initial={{ y: -50, opacity: 0 }}
               animate={{ y: 0, opacity: 1 }}
               exit={{ y: -50, opacity: 0 }}
               transition={{ duration: 0.5 }}
             >
-              <div className="text-4xl mb-4">✅</div>
-              <h2 className="text-2xl font-semibold mb-2">Purchase Successful!</h2>
-              <p className="text-sm text-gray-200">Thank you for your order. Your items will be processed shortly.</p>
+              <IconCheck className="mx-auto mb-4 h-10 w-10 text-teal-200" />
+              <h2 className="mb-2 text-2xl font-semibold">Sale Recorded</h2>
+              <p className="text-sm text-gray-200">The transaction was saved to Supabase.</p>
             </motion.div>
           </motion.div>
         )}

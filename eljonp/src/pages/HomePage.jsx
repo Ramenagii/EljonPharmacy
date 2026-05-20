@@ -1,7 +1,6 @@
 import React from "react";
 import HeroSection from "../components/HeroSection";
 import CategorySection from "../components/CategorySection";
-import UploadPrescription from "../components/UploadPrescription";
 import FeaturedProducts from "../components/FeaturedProducts";
 import Testimonials from "../components/Testimonials";
 
@@ -11,7 +10,6 @@ const HomePage = () => {
       <HeroSection />
       <CategorySection />
       <FeaturedProducts />
-      <UploadPrescription />
       <Testimonials />
     </div>
   );

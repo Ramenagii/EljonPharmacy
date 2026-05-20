@@ -93,7 +93,7 @@ const Navbar = ({ cartItems = [] }) => {
 
         {/* Desktop Navigation */}
         <nav className="hidden md:flex items-center space-x-8">
-          {["Home", "Shop", "Admin", "Reports", "About", "Contact"].map((item, index) => (
+          {["Home", "Shop", "About", "Contact"].map((item, index) => (
             <motion.div
               key={item}
               initial={{ opacity: 0, y: -20 }}
@@ -206,7 +206,7 @@ const Navbar = ({ cartItems = [] }) => {
             exit="closed"
           >
             <div className="py-2">
-              {["Home", "Shop", "Admin", "Reports", "About", "Contact"].map((item, index) => (
+              {["Home", "Shop", "About", "Contact"].map((item, index) => (
                 <motion.div
                   key={item}
                   variants={itemVariants}

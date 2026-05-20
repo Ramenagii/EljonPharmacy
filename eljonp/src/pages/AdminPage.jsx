@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { IconChartBar, IconLogout, IconReceipt2 } from '@tabler/icons-react';
 import ReportsPage from './ReportsPage';
 import {
   createSale,
@@ -169,19 +170,50 @@ const AdminPage = () => {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10">
-      <div className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-        <div>
-          <h1 className="text-4xl font-bold text-gray-900">Admin Sales</h1>
-          <p className="mt-2 text-gray-600">Signed in as {session.user.email}</p>
-        </div>
-        <button onClick={handleSignOut} className="rounded border px-4 py-2 font-semibold hover:bg-gray-50">
-          Sign Out
-        </button>
-      </div>
+    <div className="min-h-screen bg-slate-100">
+      <div className="mx-auto grid max-w-7xl gap-6 px-4 py-8 lg:grid-cols-[260px_1fr]">
+        <aside className="h-fit rounded-xl border border-slate-200 bg-slate-950 p-5 text-white shadow-sm">
+          <div className="mb-8">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-lg bg-teal-500 text-2xl font-bold">
+              +
+            </div>
+            <h1 className="text-xl font-bold">Eljon Admin</h1>
+            <p className="mt-1 text-sm text-slate-300">{session.user.email}</p>
+          </div>
+          <nav className="space-y-2 text-sm font-semibold">
+            <a href="#record-sale" className="flex items-center rounded-lg bg-white/10 px-3 py-2">
+              <IconReceipt2 className="mr-2 h-4 w-4" />
+              Record Sale
+            </a>
+            <a href="#reports" className="flex items-center rounded-lg px-3 py-2 text-slate-300 hover:bg-white/10 hover:text-white">
+              <IconChartBar className="mr-2 h-4 w-4" />
+              Reports
+            </a>
+          </nav>
+          <button onClick={handleSignOut} className="mt-8 inline-flex w-full items-center justify-center rounded-lg border border-white/20 px-4 py-2 font-semibold text-white hover:bg-white/10">
+            <IconLogout className="mr-2 h-4 w-4" />
+            Sign Out
+          </button>
+        </aside>
 
-      <section className="rounded-lg border bg-white p-6 shadow-sm">
-        <h2 className="text-xl font-semibold text-gray-900">Record Sale</h2>
+        <main>
+          <div className="mb-6 rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+            <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">Sales workstation</p>
+            <h2 className="mt-2 text-4xl font-bold text-slate-900">Admin Sales</h2>
+            <p className="mt-2 text-slate-600">Record transactions and review daily or monthly totals from one place.</p>
+          </div>
+
+          <section id="record-sale" className="rounded-xl border border-slate-200 bg-white p-6 shadow-sm">
+        <div className="mb-5 flex flex-col gap-3 border-b border-slate-200 pb-5 sm:flex-row sm:items-center sm:justify-between">
+          <div>
+            <h2 className="text-xl font-semibold text-gray-900">Record Sale</h2>
+            <p className="mt-1 text-sm text-slate-500">Enter item lines exactly as they appear in the transaction.</p>
+          </div>
+          <div className="rounded-lg bg-teal-50 px-4 py-2 text-right">
+            <p className="text-xs font-semibold uppercase text-teal-700">Current total</p>
+            <p className="text-xl font-bold text-teal-800">{money.format(total)}</p>
+          </div>
+        </div>
         {message && <p className="mt-4 rounded border border-green-200 bg-green-50 px-4 py-3 text-green-700">{message}</p>}
         {error && <p className="mt-4 rounded border border-red-200 bg-red-50 px-4 py-3 text-red-700">{error}</p>}
 
@@ -208,11 +240,11 @@ const AdminPage = () => {
 
           <div className="space-y-3">
             {items.map((item, index) => (
-              <div key={index} className="grid gap-3 md:grid-cols-[1fr_120px_140px_auto]">
-                <input placeholder="Item name" value={item.name} onChange={(event) => updateItem(index, 'name', event.target.value)} className="rounded border px-3 py-2" required />
-                <input type="number" min="1" step="1" placeholder="Qty" value={item.quantity} onChange={(event) => updateItem(index, 'quantity', event.target.value)} className="rounded border px-3 py-2" required />
-                <input type="number" min="0" step="0.01" placeholder="Unit price" value={item.unitPrice} onChange={(event) => updateItem(index, 'unitPrice', event.target.value)} className="rounded border px-3 py-2" required />
-                <button type="button" onClick={() => removeItem(index)} className="rounded border px-3 py-2 hover:bg-gray-50" disabled={items.length === 1}>
+              <div key={index} className="grid gap-3 rounded-lg border border-slate-100 bg-slate-50 p-3 md:grid-cols-[1fr_120px_140px_auto]">
+                <input placeholder="Item name" value={item.name} onChange={(event) => updateItem(index, 'name', event.target.value)} className="rounded border border-slate-200 bg-white px-3 py-2" required />
+                <input type="number" min="1" step="1" placeholder="Qty" value={item.quantity} onChange={(event) => updateItem(index, 'quantity', event.target.value)} className="rounded border border-slate-200 bg-white px-3 py-2" required />
+                <input type="number" min="0" step="0.01" placeholder="Unit price" value={item.unitPrice} onChange={(event) => updateItem(index, 'unitPrice', event.target.value)} className="rounded border border-slate-200 bg-white px-3 py-2" required />
+                <button type="button" onClick={() => removeItem(index)} className="rounded border border-slate-200 bg-white px-3 py-2 font-semibold hover:bg-gray-50 disabled:opacity-50" disabled={items.length === 1}>
                   Remove
                 </button>
               </div>
@@ -234,7 +266,11 @@ const AdminPage = () => {
         </form>
       </section>
 
-      <ReportsPage />
+          <section id="reports" className="mt-6 overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
+            <ReportsPage />
+          </section>
+        </main>
+      </div>
     </div>
   );
 };

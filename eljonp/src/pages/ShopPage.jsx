@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { IconSearch, IconShoppingCartPlus } from '@tabler/icons-react';
 import { staggerContainer, fadeIn, textVariant } from '../utils/motion';
+import { money, parsePrice } from '../services/salesApi';
 
 const categorizedInventory = {
   "Medical Supplies": [
@@ -85,20 +87,25 @@ const categorizedInventory = {
 
 const ShopPage = ({ addToCart }) => {
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeCategory, setActiveCategory] = useState('All');
+  const categories = ['All', ...Object.keys(categorizedInventory)];
 
   const filteredInventory = Object.entries(categorizedInventory).reduce((acc, [category, items]) => {
     const query = searchQuery.toLowerCase();
-    const categoryMatch = category.toLowerCase().includes(query);
+    const categoryMatch = activeCategory === 'All' || activeCategory === category;
 
-    const filteredItems = categoryMatch
-      ? items
-      : items.filter(item => item.name.toLowerCase().includes(query));
+    if (!categoryMatch) {
+      return acc;
+    }
+
+    const filteredItems = items.filter((item) => {
+      return item.name.toLowerCase().includes(query) || category.toLowerCase().includes(query);
+    });
 
     if (filteredItems.length > 0) {
       acc[category] = {
         name: category,
         items: filteredItems,
-        isCategoryMatch: categoryMatch,
       };
     }
     return acc;
@@ -109,60 +116,91 @@ const ShopPage = ({ addToCart }) => {
       initial="hidden"
       animate="show"
       variants={staggerContainer}
-      className="py-10 px-4 max-w-7xl mx-auto"
+      className="mx-auto max-w-7xl px-4 py-10"
     >
-      <motion.div variants={textVariant(0.1)}>
-        <h1 className="text-4xl font-bold mb-6">Pharmacy Inventory</h1>
-        <p className="mb-8 text-gray-600">Search and browse our complete medical catalog</p>
+      <motion.div variants={textVariant(0.1)} className="mb-8">
+        <span className="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-700">
+          Complete catalog
+        </span>
+        <h1 className="mt-3 text-4xl font-bold text-slate-900">Pharmacy Inventory</h1>
+        <p className="mt-2 max-w-2xl text-slate-600">
+          Search medicines, supplies, personal care items, and everyday health essentials.
+        </p>
       </motion.div>
 
-      {/* Search Bar */}
-      <motion.div variants={fadeIn('up', 'spring', 0.2, 0.75)} className="mb-8">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="w-full p-4 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={searchQuery}
-          onChange={(e) => setSearchQuery(e.target.value)}
-        />
+      <motion.div
+        variants={fadeIn('up', 'spring', 0.2, 0.75)}
+        className="sticky top-[72px] z-20 mb-8 rounded-xl border border-slate-200 bg-white/95 p-4 shadow-sm backdrop-blur"
+      >
+        <div className="relative">
+          <IconSearch className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+          <input
+            type="text"
+            placeholder="Search products or categories"
+            className="w-full rounded-lg border border-slate-200 bg-slate-50 py-3 pl-11 pr-4 text-slate-900 outline-none transition focus:border-teal-500 focus:bg-white focus:ring-2 focus:ring-teal-100"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+          />
+        </div>
+
+        <div className="mt-4 flex gap-2 overflow-x-auto pb-1">
+          {categories.map((category) => (
+            <button
+              key={category}
+              onClick={() => setActiveCategory(category)}
+              className={`shrink-0 rounded-full border px-4 py-2 text-sm font-semibold transition ${
+                activeCategory === category
+                  ? 'border-teal-600 bg-teal-600 text-white'
+                  : 'border-slate-200 bg-white text-slate-600 hover:border-teal-300 hover:text-teal-700'
+              }`}
+            >
+              {category}
+            </button>
+          ))}
+        </div>
       </motion.div>
 
       <AnimatePresence mode="wait">
-        {Object.values(filteredInventory).map(({ name: category, items, isCategoryMatch }, index) => (
+        {Object.values(filteredInventory).map(({ name: category, items }, index) => (
           <motion.div
             key={category}
             variants={fadeIn('up', 'spring', index * 0.1, 0.75)}
-            className="mb-12"
+            className="mb-10"
           >
             <motion.h2
-              className={`text-2xl font-semibold mb-4 border-b-2 pb-2 ${isCategoryMatch ? 'text-green-600 border-green-200' : 'text-blue-600 border-blue-200'}`}
+              className="mb-4 border-b border-slate-200 pb-3 text-2xl font-semibold text-slate-900"
               variants={textVariant(0.1)}
             >
               {category}
-              {isCategoryMatch && <span className="ml-2 text-sm text-green-500">(Category Match)</span>}
+              <span className="ml-3 text-sm font-medium text-slate-400">{items.length} items</span>
             </motion.h2>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
               {items.map((item, itemIndex) => (
                 <motion.div
                   key={item.name}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: itemIndex * 0.05 }}
-                  className={`p-4 border rounded-lg transition-shadow duration-200 bg-white ${isCategoryMatch ? 'hover:shadow-green-lg border-green-100' : 'hover:shadow-lg'}`}
+                  className="flex min-h-[178px] flex-col justify-between rounded-lg border border-slate-200 bg-white p-4 shadow-sm transition hover:-translate-y-0.5 hover:border-teal-200 hover:shadow-md"
                 >
-                  <h3 className="font-medium text-gray-800 mb-1">
-                    {item.name}
-                    {item.name.toLowerCase().includes(searchQuery.toLowerCase()) && (
-                      <span className="ml-2 text-xs text-blue-500">(Name Match)</span>
-                    )}
-                  </h3>
-                  <p className="text-sm text-blue-600 font-semibold">{item.price}</p>
+                  <div>
+                    <span className="mb-3 inline-flex rounded-full bg-slate-100 px-2.5 py-1 text-xs font-semibold text-slate-500">
+                      In stock
+                    </span>
+                    <h3 className="min-h-12 text-sm font-semibold uppercase leading-6 tracking-normal text-slate-900">
+                      {item.name}
+                    </h3>
+                    <p className="mt-2 text-lg font-bold text-teal-700">
+                      {money.format(parsePrice(item.price))}
+                    </p>
+                  </div>
                   <button
                     onClick={() => addToCart(item)}
-                    className="mt-2 bg-teal-500 text-white px-4 py-2 rounded font-medium hover:bg-teal-600 transition-colors"
+                    className="mt-4 inline-flex items-center justify-center rounded-lg bg-teal-600 px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-teal-700"
                   >
-                    Add to Cart
+                    <IconShoppingCartPlus className="mr-2 h-4 w-4" />
+                    Add
                   </button>
                 </motion.div>
               ))}
