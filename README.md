@@ -2,6 +2,8 @@
 
 React pharmacy storefront with Supabase-backed sales recording and reporting.
 
+![Eljon Pharmacy screenshot](./docs/screenshot.png)
+
 ## Project Location
 
 The Vite application source lives in [`eljonp/`](./eljonp).
@@ -25,4 +27,4 @@ Fill `.env.local` with the Supabase values documented in [`eljonp/README.md`](./
 
 ## Quality Gate
 
-GitHub Actions runs install, lint, and production build checks on pushes and pull requests.
+GitHub Actions runs install, audit, lint, tests, and production build checks on pushes and pull requests.

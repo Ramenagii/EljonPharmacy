@@ -2,6 +2,8 @@
 
 React/Vite pharmacy storefront with a serverless Supabase backend for sales recording and reporting.
 
+![Eljon Pharmacy screenshot](../docs/screenshot.png)
+
 ## Local Setup
 
 ```powershell
