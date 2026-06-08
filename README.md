@@ -1,5 +1,7 @@
 # Eljon Pharmacy
 
+[![CI](https://github.com/Ramenagii/EljonPharmacy/actions/workflows/ci.yml/badge.svg)](https://github.com/Ramenagii/EljonPharmacy/actions/workflows/ci.yml)
+
 React pharmacy storefront with Supabase-backed sales recording and reporting.
 
 ![Eljon Pharmacy screenshot](./docs/screenshot.png)
